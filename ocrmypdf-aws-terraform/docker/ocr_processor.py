@@ -7,22 +7,22 @@ import boto3
 import logging
 from urllib.parse import urlparse
 
-# Настройка логирования
+# Set up logging
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Инициализация AWS клиентов
+# Initialize AWS clients
 s3 = boto3.client('s3')
 sqs = boto3.client('sqs')
 sns = boto3.client('sns')
 
-# Получение переменных окружения
+# Get environment variables
 SQS_QUEUE_URL = os.environ['SQS_QUEUE_URL']
 SNS_TOPIC_ARN = os.environ['SNS_TOPIC_ARN']
 
 def parse_s3_path(s3_path):
-    """Парсинг S3 пути в формате s3://bucket/key"""
+    """Parse S3 path in the format s3://bucket/key"""
     parsed = urlparse(s3_path)
     if parsed.scheme != 's3':
         raise ValueError(f"Unsupported scheme: {parsed.scheme}")
@@ -32,28 +32,28 @@ def parse_s3_path(s3_path):
     return bucket, key
 
 def download_from_s3(s3_path, local_path):
-    """Скачивание файла из S3"""
+    """Download file from S3"""
     bucket, key = parse_s3_path(s3_path)
     logger.info(f"Downloading {key} from bucket {bucket} to {local_path}")
     s3.download_file(bucket, key, local_path)
 
 def upload_to_s3(local_path, s3_path):
-    """Загрузка файла в S3"""
+    """Upload file to S3"""
     bucket, key = parse_s3_path(s3_path)
     logger.info(f"Uploading {local_path} to {bucket}/{key}")
     s3.upload_file(local_path, bucket, key, ExtraArgs={'ContentType': 'application/pdf'})
 
 def process_pdf(input_path, output_path, params):
-    """Обработка PDF с помощью OCRMyPDF"""
+    """Process PDF with OCRMyPDF"""
     cmd = ["ocrmypdf"]
     
-    # Добавление параметров OCR
+    # Add OCR parameters
     if params.get("language"):
         cmd.extend(["-l", params["language"]])
     if params.get("deskew", False):
         cmd.append("--deskew")
     
-    # Добавление путей к файлам
+    # Add file paths
     cmd.extend([input_path, output_path])
     
     logger.info(f"Running OCR command: {' '.join(cmd)}")
@@ -68,7 +68,7 @@ def process_pdf(input_path, output_path, params):
     return True
 
 def send_notification(file_id, status, error=None):
-    """Отправка уведомления о статусе обработки"""
+    """Send notification about processing status"""
     message = {
         "file_id": file_id,
         "status": status,
@@ -87,7 +87,7 @@ def send_notification(file_id, status, error=None):
     )
 
 def process_message(message):
-    """Обработка сообщения из SQS"""
+    """Process message from SQS"""
     try:
         logger.info(f"Processing message: {message['MessageId']}")
         data = json.loads(message['Body'])
@@ -100,24 +100,24 @@ def process_message(message):
             logger.error(f"Invalid message format: {data}")
             return False
         
-        # Создание временных файлов
+        # Create temporary files
         input_path = f"/tmp/{file_id}_input.pdf"
         output_path = f"/tmp/{file_id}_output.pdf"
         
         try:
-            # Отправка уведомления о начале обработки
+            # Send notification about processing start
             send_notification(file_id, "processing")
             
-            # Скачивание файла
+            # Download file
             download_from_s3(source, input_path)
             
-            # Обработка файла
+            # Process file
             process_pdf(input_path, output_path, ocr_params)
             
-            # Загрузка результата
+            # Upload result
             upload_to_s3(output_path, destination)
             
-            # Отправка уведомления о завершении
+            # Send notification about processing completion
             send_notification(file_id, "completed")
             
             return True
@@ -128,7 +128,7 @@ def process_message(message):
             return False
         
         finally:
-            # Удаление временных файлов
+            # Delete temporary files
             for path in [input_path, output_path]:
                 if os.path.exists(path):
                     os.remove(path)
@@ -139,12 +139,12 @@ def process_message(message):
         return False
 
 def main():
-    """Основной цикл обработки сообщений"""
+    """Main loop for processing messages"""
     logger.info("Starting OCR processor")
     
     while True:
         try:
-            # Получение сообщений из SQS
+            # Get messages from SQS
             response = sqs.receive_message(
                 QueueUrl=SQS_QUEUE_URL,
                 MaxNumberOfMessages=1,
@@ -161,9 +161,9 @@ def main():
             for message in messages:
                 receipt_handle = message['ReceiptHandle']
                 
-                # Обработка сообщения
+                # Process message
                 if process_message(message):
-                    # Удаление сообщения из очереди при успешной обработке
+                    # Delete message from queue if processing was successful
                     sqs.delete_message(
                         QueueUrl=SQS_QUEUE_URL,
                         ReceiptHandle=receipt_handle
@@ -174,7 +174,6 @@ def main():
         
         except Exception as e:
             logger.error(f"Error in main loop: {str(e)}")
-            time.sleep(5)  # Пауза перед повторной попыткой
-
+            time.sleep(5)
 if __name__ == "__main__":
     main()
