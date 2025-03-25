@@ -17,17 +17,6 @@ S3_BUCKET = os.environ['S3_BUCKET']  # S3 bucket for PDF storage
 S3_WEBSITE_BUCKET = os.environ.get('S3_WEBSITE_BUCKET', '')  # S3 bucket for website
 
 def handler(event, context):
-    """Lambda handler for updating file status.
-
-    Reads an SNS message, updates the status JSON file on the website bucket, and returns a response.
-
-    Args:
-        event (dict): Lambda event containing SNS message.
-        context (object): Lambda context.
-
-    Returns:
-        dict: HTTP-like response with statusCode and body.
-    """
     try:
         print(f"Received event: {json.dumps(event)}")
         message = json.loads(event['Records'][0]['Sns']['Message'])

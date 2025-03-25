@@ -1,3 +1,7 @@
+#  ╔═╗╔╗╔╔═╗
+#  ╚═╗║║║╚═╗
+#  ╚═╝╝╚╝╚═╝
+
 resource "aws_sns_topic" "ocr_notifications" {
   name = "${var.prefix}-ocr-notifications-${var.environment}"
   

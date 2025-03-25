@@ -1,3 +1,7 @@
+#  ╔═╗╔═╗ ╔═╗
+#  ╚═╗║═╬╗╚═╗
+#  ╚═╝╚═╝╚╚═╝
+
 resource "aws_sqs_queue" "ocr_queue" {
   name                      = "${var.prefix}-ocr-queue-${var.environment}"
   delay_seconds             = 0

@@ -27,17 +27,6 @@ SQS_QUEUE_URL = os.environ['SQS_QUEUE_URL']  # SQS Queue URL
 SNS_TOPIC_ARN = os.environ['SNS_TOPIC_ARN']  # SNS Topic ARN
 
 def parse_s3_path(s3_path):
-    """Parse S3 path in the format s3://bucket/key.
-
-    Args:
-        s3_path (str): The S3 path.
-
-    Returns:
-        tuple: (bucket, key).
-
-    Raises:
-        ValueError: If scheme is not 's3'.
-    """
     parsed = urlparse(s3_path)
     if parsed.scheme != 's3':
         raise ValueError(f"Unsupported scheme: {parsed.scheme}")
@@ -46,41 +35,16 @@ def parse_s3_path(s3_path):
     return bucket, key
 
 def download_from_s3(s3_path, local_path):
-    """Download a file from S3.
-
-    Args:
-        s3_path (str): S3 path (s3://bucket/key).
-        local_path (str): Local file path.
-    """
     bucket, key = parse_s3_path(s3_path)
     logger.info(f"Downloading {key} from bucket {bucket} to {local_path}")
     s3.download_file(bucket, key, local_path)
 
 def upload_to_s3(local_path, s3_path):
-    """Upload a file to S3.
-
-    Args:
-        local_path (str): Local file path.
-        s3_path (str): S3 destination path.
-    """
     bucket, key = parse_s3_path(s3_path)
     logger.info(f"Uploading {local_path} to {bucket}/{key}")
     s3.upload_file(local_path, bucket, key, ExtraArgs={'ContentType': 'application/pdf'})
 
 def process_pdf(input_path, output_path, params):
-    """Process a PDF file using OCRMyPDF.
-
-    Args:
-        input_path (str): Path to input PDF.
-        output_path (str): Path for output PDF.
-        params (dict): OCR parameters (e.g., language, deskew).
-
-    Returns:
-        bool: True if OCR is successful.
-
-    Raises:
-        Exception: If OCR processing fails.
-    """
     cmd = ["ocrmypdf"]
     if params.get("language"):
         cmd.extend(["-l", params["language"]])
@@ -96,13 +60,6 @@ def process_pdf(input_path, output_path, params):
     return True
 
 def send_notification(file_id, status, error=None):
-    """Send an SNS notification with the processing status.
-
-    Args:
-        file_id (str): Unique file ID.
-        status (str): Processing status.
-        error (str, optional): Error message if any.
-    """
     message = {
         "file_id": file_id,
         "status": status,
@@ -118,16 +75,6 @@ def send_notification(file_id, status, error=None):
     )
 
 def process_message(message):
-    """Process a single SQS message for OCR.
-
-    Downloads the PDF, applies OCR, uploads the result, and sends notifications.
-
-    Args:
-        message (dict): SQS message.
-
-    Returns:
-        bool: True if processing is successful, else False.
-    """
     try:
         logger.info(f"Processing message: {message['MessageId']}")
         data = json.loads(message['Body'])

@@ -20,14 +20,6 @@ S3_BUCKET = os.environ['S3_BUCKET']  # S3 bucket for file storage
 SQS_QUEUE_URL = os.environ['SQS_QUEUE_URL']  # SQS Queue URL
 
 def parse_multipart_form(event):
-    """Parse multipart/form-data from API Gateway event.
-
-    Args:
-        event (dict): API Gateway event with multipart/form-data.
-
-    Returns:
-        tuple: (file_content, params) where file_content is a string and params is a dict.
-    """
     body = event.get('body', '')
     if event.get('isBase64Encoded', False):
         body = base64.b64decode(body).decode('utf-8')
@@ -56,17 +48,6 @@ def parse_multipart_form(event):
     return file_content, params
 
 def handler(event, context):
-    """Lambda handler for file upload.
-
-    Parses the multipart/form-data, saves the file to S3, and sends an SQS message to trigger OCR.
-
-    Args:
-        event (dict): API Gateway event.
-        context (object): Lambda context.
-
-    Returns:
-        dict: HTTP-like response with statusCode, headers, and body.
-    """
     try:
         print(f"Received event: {json.dumps(event)}")
         content_type = event.get('headers', {}).get('content-type', '')

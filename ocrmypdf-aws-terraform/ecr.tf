@@ -1,4 +1,6 @@
-# Создаем репозиторий ECR
+#  ╔═╗╔═╗╦═╗
+#  ║╣ ║  ╠╦╝
+#  ╚═╝╚═╝╩╚═
 resource "aws_ecr_repository" "ocrmypdf" {
   name                 = "${var.prefix}-ocrmypdf-${var.environment}"
   image_tag_mutability = "MUTABLE"
@@ -8,7 +10,7 @@ resource "aws_ecr_repository" "ocrmypdf" {
   }
 }
 
-# Ручная загрузка образа в ECR с помощью null_resource
+# Upload an image to ECR using null_resource
 resource "null_resource" "docker_pull_and_push" {
   provisioner "local-exec" {
     command = <<-EOT
@@ -28,7 +30,7 @@ resource "null_resource" "docker_pull_and_push" {
   depends_on = [aws_ecr_repository.ocrmypdf]
 }
 
-# Политика жизненного цикла для ECR
+# ECR lifecycle policy
 resource "aws_ecr_lifecycle_policy" "ocrmypdf_policy" {
   repository = aws_ecr_repository.ocrmypdf.name
 

@@ -1,3 +1,7 @@
+#  ╔╗ ╦ ╦╔═╗╦╔═╔═╗╔╦╗  ╔═╗╔═╗╦═╗  ╔═╗╔╦╗╔═╗╔╦╗╦╔═╗
+#  ╠╩╗║ ║║  ╠╩╗║╣  ║   ╠╣ ║ ║╠╦╝  ╚═╗ ║ ╠═╣ ║ ║║  
+#  ╚═╝╚═╝╚═╝╩ ╩╚═╝ ╩   ╚  ╚═╝╩╚═  ╚═╝ ╩ ╩ ╩ ╩ ╩╚═╝
+
 resource "aws_s3_bucket" "website" {
   bucket = "${var.prefix}-website-${var.environment}"
   
@@ -46,7 +50,9 @@ resource "aws_s3_bucket_policy" "website" {
   })
 }
 
-# Upload website files
+#  ╦ ╦╔═╗╦  ╔═╗╔═╗╔╦╗  ╔═╗╦═╗╔═╗╔╗╔╔═╗╔╗╔╔╦╗  ╔╦╗╔═╗  ╔╗ ╦ ╦╔═╗╦╔═╔═╗╔╦╗
+#  ║ ║╠═╝║  ║ ║╠═╣ ║║  ╠╣ ╠╦╝║ ║║║║║╣ ║║║ ║║   ║ ║ ║  ╠╩╗║ ║║  ╠╩╗║╣  ║ 
+#  ╚═╝╩  ╩═╝╚═╝╩ ╩═╩╝  ╚  ╩╚═╚═╝╝╚╝╚═╝╝╚╝═╩╝   ╩ ╚═╝  ╚═╝╚═╝╚═╝╩ ╩╚═╝ ╩ 
 resource "aws_s3_object" "index_html" {
   bucket = aws_s3_bucket.website.id
   key    = "index.html"

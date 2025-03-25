@@ -1,1 +1,0 @@
-This folder may contain temporary files during processing.
