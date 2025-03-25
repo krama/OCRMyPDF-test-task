@@ -1,32 +1,23 @@
-FROM alpine:latest
+# Base image using Alpine 3.17
+FROM alpine:3.17
 
-RUN apk add --no-cache \
-    python3 \
-    py3-pip \
-    tesseract-ocr \
-    tesseract-ocr-data-eng \
-    ghostscript \
-    unpaper \
-    pngquant \
-    qpdf \
-    python3-dev \
-    gcc \
-    libc-dev \
-    libffi-dev \
-    jpeg-dev \
-    zlib-dev
+# Install dependencies
+RUN apk add --no-cache python3 py3-pip tesseract-ocr tesseract-ocr-data-eng ghostscript unpaper pngquant qpdf \
+    python3-dev gcc libc-dev libffi-dev jpeg-dev zlib-dev
 
-RUN python3 -m venv /opt/venv
+# Create Python virtual environment and install packages
+RUN python3 -m venv /opt/venv && \
+    /opt/venv/bin/pip install --upgrade pip && \
+    /opt/venv/bin/pip install --no-cache-dir ocrmypdf boto3 pillow
 
-RUN /opt/venv/bin/pip install --upgrade pip && \
-    /opt/venv/bin/pip install --no-cache-dir \
-    ocrmypdf \
-    boto3 \
-    pillow
-
+# Set working directory
 WORKDIR /app
 
-COPY ocr_processor.py /app/ocr_processor.py
-RUN chmod +x /app/ocr_processor.py
+# Copy OCR processor script into container
+COPY ocr_processor.py .
 
-CMD ["/opt/venv/bin/python", "/app/ocr_processor.py"]
+# Make the OCR processor script executable
+RUN chmod +x ocr_processor.py
+
+# Start the OCR processor
+CMD ["/opt/venv/bin/python", "ocr_processor.py"]
