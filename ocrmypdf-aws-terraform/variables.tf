@@ -1,7 +1,3 @@
-#  ╦  ╦╔═╗╦═╗╔═╗
-#  ╚╗╔╝╠═╣╠╦╝╚═╗
-#   ╚╝ ╩ ╩╩╚═╚═╝
-
 variable "region" {
   description = "AWS region"
   type        = string
@@ -42,4 +38,10 @@ variable "docker_hub_image" {
   description = "Docker Hub image (optional)"
   type        = string
   default     = "krama4d/ocrmypdf:latest"
+}
+
+variable "use_docker_hub" {
+  description = "Flag to determine whether to use Docker Hub image or ECR"
+  type        = bool
+  default     = true
 }

@@ -1,189 +1,146 @@
-#  ╦  ╦╔═╗╔═╗  ╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔
-#  ╚╗╔╝╠═╝║    ║  ╠╦╝║╣ ╠═╣ ║ ║║ ║║║║
-#   ╚╝ ╩  ╚═╝  ╚═╝╩╚═╚═╝╩ ╩ ╩ ╩╚═╝╝╚╝
+locals {
+  create_vpc  = var.vpc_id == null
+  vpc_id      = local.create_vpc ? aws_vpc.main["vpc"].id : var.vpc_id
+  
+  subnet_map = {
+    "private_1" = {
+      cidr_block        = "10.0.1.0/24"
+      availability_zone = "${var.region}a"
+      is_public         = false
+    },
+    "private_2" = {
+      cidr_block        = "10.0.2.0/24"
+      availability_zone = "${var.region}b" 
+      is_public         = false
+    },
+    "public_1"  = {
+      cidr_block        = "10.0.3.0/24"
+      availability_zone = "${var.region}a"
+      is_public         = true
+    },
+    "public_2"  = {
+      cidr_block        = "10.0.4.0/24"
+      availability_zone = "${var.region}b"
+      is_public         = true
+    }
+  }
+  
+  private_subnets = { for k, v in local.subnet_map : k => v if !v.is_public }
+  public_subnets  = { for k, v in local.subnet_map : k => v if v.is_public }
+}
 
-# Create a new VPC if no external VPC ID is provided
 resource "aws_vpc" "main" {
-  count = var.vpc_id == null ? 1 : 0
+  for_each = local.create_vpc ? { "vpc" = true } : {}
 
-  cidr_block           = "10.0.0.0/16"                     # Main CIDR block for the VPC
-  enable_dns_support   = true                              # Enable DNS support
-  enable_dns_hostnames = true                              # Enable DNS hostnames
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
 
   tags = {
-    Name = "${var.prefix}-vpc-${var.environment}"         # Tag: VPC name
+    Name = "${var.prefix}-vpc-${var.environment}"
   }
 }
 
-#  ╔═╗╦ ╦╔╗ ╔╗╔╔═╗╔╦╗╔═╗  ╔═╗╦═╗╦╦  ╦╔═╗╔╦╗╔═╗
-#  ╚═╗║ ║╠╩╗║║║║╣  ║ ╚═╗  ╠═╝╠╦╝║╚╗╔╝╠═╣ ║ ║╣ 
-#  ╚═╝╚═╝╚═╝╝╚╝╚═╝ ╩ ╚═╝  ╩  ╩╚═╩ ╚╝ ╩ ╩ ╩ ╚═╝
+resource "aws_subnet" "subnets" {
+  for_each = local.create_vpc ? local.subnet_map : {}
 
-# Create private subnet 1
-resource "aws_subnet" "private_subnet_1" {
-  count = var.vpc_id == null ? 1 : 0
-
-  vpc_id            = aws_vpc.main[0].id                 # Reference to the main VPC
-  cidr_block        = "10.0.1.0/24"                      # CIDR block for private subnet 1
-  availability_zone = "${var.region}a"                   # Availability zone
+  vpc_id                  = aws_vpc.main["vpc"].id
+  cidr_block              = each.value.cidr_block
+  availability_zone       = each.value.availability_zone
+  map_public_ip_on_launch = each.value.is_public
 
   tags = {
-    Name = "${var.prefix}-private-subnet-1-${var.environment}"  # Tag: Private subnet 1
+    Name = "${var.prefix}-${each.key}-subnet-${var.environment}"
   }
+  
+  depends_on = [aws_vpc.main]
 }
 
-# Create private subnet 2
-resource "aws_subnet" "private_subnet_2" {
-  count = var.vpc_id == null ? 1 : 0
-
-  vpc_id            = aws_vpc.main[0].id                 # Reference to the main VPC
-  cidr_block        = "10.0.2.0/24"                      # CIDR block for private subnet 2
-  availability_zone = "${var.region}b"                   # Availability zone
-
-  tags = {
-    Name = "${var.prefix}-private-subnet-2-${var.environment}"  # Tag: Private subnet 2
-  }
-}
-
-#  ╔═╗╦ ╦╔╗ ╔╗╔╔═╗╔╦╗╔═╗  ╔═╗╦ ╦╔╗ ╦  ╦╔═╗
-#  ╚═╗║ ║╠╩╗║║║║╣  ║ ╚═╗  ╠═╝║ ║╠╩╗║  ║║  
-#  ╚═╝╚═╝╚═╝╝╚╝╚═╝ ╩ ╚═╝  ╩  ╚═╝╚═╝╩═╝╩╚═╝
-
-# Create public subnet 1
-resource "aws_subnet" "public_subnet_1" {
-  count = var.vpc_id == null ? 1 : 0
-
-  vpc_id                  = aws_vpc.main[0].id            # Reference to the main VPC
-  cidr_block              = "10.0.3.0/24"                 # CIDR block for public subnet 1
-  availability_zone       = "${var.region}a"              # Availability zone
-  map_public_ip_on_launch = true                        # Enable automatic public IP assignment
-
-  tags = {
-    Name = "${var.prefix}-public-subnet-1-${var.environment}"  # Tag: Public subnet 1
-  }
-}
-
-# Create public subnet 2
-resource "aws_subnet" "public_subnet_2" {
-  count = var.vpc_id == null ? 1 : 0
-
-  vpc_id                  = aws_vpc.main[0].id            # Reference to the main VPC
-  cidr_block              = "10.0.4.0/24"                 # CIDR block for public subnet 2
-  availability_zone       = "${var.region}b"              # Availability zone
-  map_public_ip_on_launch = true                        # Enable automatic public IP assignment
-
-  tags = {
-    Name = "${var.prefix}-public-subnet-2-${var.environment}"  # Tag: Public subnet 2
-  }
-}
-
-#  ╦╔═╗  ╔═╗╦ ╦╔╗ ╦  ╦╔═╗
-#  ║║ ╦  ╠═╝║ ║╠╩╗║  ║║  
-#  ╩╚═╝  ╩  ╚═╝╚═╝╩═╝╩╚═╝
-
-# Create an Internet Gateway for public subnets
 resource "aws_internet_gateway" "igw" {
-  count = var.vpc_id == null ? 1 : 0
+  for_each = local.create_vpc ? { "igw" = true } : {}
 
-  vpc_id = aws_vpc.main[0].id                             # Attach to the main VPC
+  vpc_id = aws_vpc.main["vpc"].id
 
   tags = {
-    Name = "${var.prefix}-igw-${var.environment}"         # Tag: Internet Gateway
+    Name = "${var.prefix}-igw-${var.environment}"
   }
+  
+  depends_on = [aws_vpc.main]
 }
 
-#  ╦═╗╔═╗╦ ╦╔╦╗╔═╗
-#  ╠╦╝║ ║║ ║ ║ ║╣ 
-#  ╩╚═╚═╝╚═╝ ╩ ╚═╝
-
-# Create a route table for public subnets
 resource "aws_route_table" "public_rt" {
-  count = var.vpc_id == null ? 1 : 0
+  for_each = local.create_vpc ? { "public" = true } : {}
 
-  vpc_id = aws_vpc.main[0].id                             # Reference to the main VPC
+  vpc_id = aws_vpc.main["vpc"].id
 
   route {
-    cidr_block = "0.0.0.0/0"                              # Route all traffic to the internet
-    gateway_id = aws_internet_gateway.igw[0].id           # Use the Internet Gateway
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw["igw"].id
   }
 
   tags = {
-    Name = "${var.prefix}-public-rt-${var.environment}"   # Tag: Public route table
+    Name = "${var.prefix}-public-rt-${var.environment}"
   }
+  
+  depends_on = [aws_vpc.main, aws_internet_gateway.igw]
 }
 
-# Associate the public route table with public subnet 1
-resource "aws_route_table_association" "public_1" {
-  count = var.vpc_id == null ? 1 : 0
+resource "aws_route_table_association" "public" {
+  for_each = local.create_vpc ? local.public_subnets : {}
 
-  subnet_id      = aws_subnet.public_subnet_1[0].id        # Public subnet 1 ID
-  route_table_id = aws_route_table.public_rt[0].id           # Public route table ID
+  subnet_id      = aws_subnet.subnets[each.key].id
+  route_table_id = aws_route_table.public_rt["public"].id
+  
+  depends_on = [aws_subnet.subnets, aws_route_table.public_rt]
 }
 
-# Associate the public route table with public subnet 2
-resource "aws_route_table_association" "public_2" {
-  count = var.vpc_id == null ? 1 : 0
-
-  subnet_id      = aws_subnet.public_subnet_2[0].id        # Public subnet 2 ID
-  route_table_id = aws_route_table.public_rt[0].id           # Public route table ID
-}
-
-#  ╔╗╔╔═╗╔╦╗
-#  ║║║╠═╣ ║ 
-#  ╝╚╝╩ ╩ ╩ 
-
-# Allocate an Elastic IP for the NAT Gateway
 resource "aws_eip" "nat_eip" {
-  count  = var.vpc_id == null ? 1 : 0
-  domain = "vpc"                                         # Domain for the Elastic IP
+  for_each = local.create_vpc ? { "nat" = true } : {}
+
+  domain = "vpc"
 
   tags = {
-    Name = "${var.prefix}-nat-eip-${var.environment}"    # Tag: NAT Elastic IP
+    Name = "${var.prefix}-nat-eip-${var.environment}"
   }
+  
+  depends_on = [aws_internet_gateway.igw]
 }
 
-# Create a NAT Gateway for private subnets
 resource "aws_nat_gateway" "nat_gw" {
-  count = var.vpc_id == null ? 1 : 0
+  for_each = local.create_vpc ? { "nat" = true } : {}
 
-  allocation_id = aws_eip.nat_eip[0].id                  # Reference to the allocated Elastic IP
-  subnet_id     = aws_subnet.public_subnet_1[0].id         # Place NAT Gateway in public subnet 1
+  allocation_id = aws_eip.nat_eip["nat"].id
+  subnet_id     = aws_subnet.subnets["public_1"].id
 
   tags = {
-    Name = "${var.prefix}-nat-gw-${var.environment}"       # Tag: NAT Gateway
+    Name = "${var.prefix}-nat-gw-${var.environment}"
   }
 
-  depends_on = [aws_internet_gateway.igw]                # Depends on the Internet Gateway creation
+  depends_on = [aws_internet_gateway.igw, aws_subnet.subnets, aws_eip.nat_eip]
 }
 
-# Create a route table for private subnets that routes through the NAT Gateway
 resource "aws_route_table" "private_rt" {
-  count = var.vpc_id == null ? 1 : 0
+  for_each = local.create_vpc ? { "private" = true } : {}
 
-  vpc_id = aws_vpc.main[0].id                             # Reference to the main VPC
+  vpc_id = aws_vpc.main["vpc"].id
 
   route {
-    cidr_block     = "0.0.0.0/0"                          # Route all traffic to the internet
-    nat_gateway_id = aws_nat_gateway.nat_gw[0].id           # Use the NAT Gateway for outbound traffic
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat_gw["nat"].id
   }
 
   tags = {
-    Name = "${var.prefix}-private-rt-${var.environment}"   # Tag: Private route table
+    Name = "${var.prefix}-private-rt-${var.environment}"
   }
+  
+  depends_on = [aws_vpc.main, aws_nat_gateway.nat_gw]
 }
 
-# Associate the private route table with private subnet 1
-resource "aws_route_table_association" "private_1" {
-  count = var.vpc_id == null ? 1 : 0
+resource "aws_route_table_association" "private" {
+  for_each = local.create_vpc ? local.private_subnets : {}
 
-  subnet_id      = aws_subnet.private_subnet_1[0].id       # Private subnet 1 ID
-  route_table_id = aws_route_table.private_rt[0].id          # Private route table ID
-}
-
-# Associate the private route table with private subnet 2
-resource "aws_route_table_association" "private_2" {
-  count = var.vpc_id == null ? 1 : 0
-
-  subnet_id      = aws_subnet.private_subnet_2[0].id       # Private subnet 2 ID
-  route_table_id = aws_route_table.private_rt[0].id          # Private route table ID
+  subnet_id      = aws_subnet.subnets[each.key].id
+  route_table_id = aws_route_table.private_rt["private"].id
+  
+  depends_on = [aws_subnet.subnets, aws_route_table.private_rt]
 }

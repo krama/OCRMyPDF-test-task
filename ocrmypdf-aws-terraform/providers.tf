@@ -1,19 +1,14 @@
-#  ╔═╗╦═╗╔═╗╦  ╦╦╔╦╗╔═╗╦═╗╔═╗
-#  ╠═╝╠╦╝║ ║╚╗╔╝║ ║║║╣ ╠╦╝╚═╗
-#  ╩  ╩╚═╚═╝ ╚╝ ╩═╩╝╚═╝╩╚═╚═╝
-
 provider "aws" {
   region = var.region
   default_tags {
     tags = {
-      Project     = "OCRMyPDF"  # Project tag
-      Environment = var.environment  # Environment tag
+      Project     = "OCRMyPDF"
+      Environment = var.environment
       ManagedBy   = "Terraform"
     }
   }
 }
 
-# Docker provider configuration for building/pushing images to ECR
 provider "docker" {
   registry_auth {
     address  = aws_ecr_repository.ocrmypdf.repository_url
@@ -22,10 +17,8 @@ provider "docker" {
   }
 }
 
-# Data source for AWS ECR authorization token
 data "aws_ecr_authorization_token" "token" {}
 
-# Terraform settings and backend configuration for remote state storage
 terraform {
   required_providers {
     aws = {
@@ -38,13 +31,9 @@ terraform {
     }
   }
 
-#  ╔╦╗╔═╗╦═╗╦═╗╔═╗╔═╗╔═╗╦═╗╔╦╗  ╔═╗╔╦╗╔═╗╔╦╗╔═╗
-#   ║ ║╣ ╠╦╝╠╦╝╠═╣╠╣ ║ ║╠╦╝║║║  ╚═╗ ║ ╠═╣ ║ ║╣ 
-#   ╩ ╚═╝╩╚═╩╚═╩ ╩╚  ╚═╝╩╚═╩ ╩  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
-
   backend "s3" {
     bucket = "ocrmypdf-state-bucket"
     key    = "ocrmypdf/terraform.tfstate"
-    region = var.region
+    region = "eu-central-2"  # Hardcoded to match var.region default
   }
 }

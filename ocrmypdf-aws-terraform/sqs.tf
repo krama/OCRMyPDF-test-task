@@ -1,7 +1,3 @@
-#  ╔═╗╔═╗ ╔═╗
-#  ╚═╗║═╬╗╚═╗
-#  ╚═╝╚═╝╚╚═╝
-
 resource "aws_sqs_queue" "ocr_queue" {
   name                      = "${var.prefix}-ocr-queue-${var.environment}"
   delay_seconds             = 0
@@ -18,6 +14,8 @@ resource "aws_sqs_queue" "ocr_queue" {
   tags = {
     Name = "${var.prefix}-ocr-queue"
   }
+  
+  depends_on = [aws_sqs_queue.ocr_dlq]
 }
 
 resource "aws_sqs_queue" "ocr_dlq" {
