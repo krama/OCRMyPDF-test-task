@@ -97,8 +97,6 @@ resource "aws_route_table_association" "public" {
 resource "aws_eip" "nat_eip" {
   for_each = local.create_vpc ? { "nat" = true } : {}
 
-  domain = "vpc"
-
   tags = {
     Name = "${var.prefix}-nat-eip-${var.environment}"
   }

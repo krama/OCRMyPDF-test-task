@@ -48,7 +48,7 @@ provider "docker" {
   }
 }
 
-data "aws_ecr_authorization_token" "token" {}
+#data "aws_ecr_authorization_token" "token" {}
 
 terraform {
   required_providers {
@@ -62,9 +62,9 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket = "ocrmypdf-state-bucket"
-    key    = "ocrmypdf/terraform.tfstate"
-    region = "eu-central-2"  # Hardcoded to match var.region default
-  }
+  # backend "s3" {
+  #   bucket = "ocrmypdf-state-bucket"
+  #   key    = "ocrmypdf/terraform.tfstate"
+  #   region = "eu-central-2"  # Hardcoded to match var.region default
+  # }
 }
