@@ -3,7 +3,9 @@ volume
 ocrmypdf-aws-terraform/.terraform
 ocrmypdf-aws-terraform/.terraform.lock.hcl
 ocrmypdf-aws-terraform/.terraform.tfstate.lock.info
-ocrmypdf-aws-terraform/.terraform.tfstate
+ocrmypdf-aws-terraform/terraform.tfstate
+ocrmypdf-aws-terraform/terraform.tfstate.backup
+ocrmypdf-aws-terraform/.infracost
 ocrmypdf-aws-terraform/lambda/file_uploader.zip
 ocrmypdf-aws-terraform/lambda/status_updater.zip
 localstack.yml
