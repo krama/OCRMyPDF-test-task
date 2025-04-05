@@ -24,20 +24,19 @@ resource "aws_cloudwatch_log_group" "ocrmypdf" {
 # ┗━╸┗━╸┗━┛    ╹ ╹ ╹┗━┛╹ ╹
 
 resource "aws_ecs_task_definition" "ocrmypdf" {
-  family                   = "${var.prefix}-ocrmypdf-${var.environment}"  # Task family name
-  requires_compatibilities = ["FARGATE"]  # Use Fargate launch type
-  network_mode             = "awsvpc"  # Networking mode
-  cpu                      = var.ecs_cpu  # CPU units
-  memory                   = var.ecs_memory  # Memory in MB
-  execution_role_arn       = aws_iam_role.ecs_execution_role.arn  # Execution role ARN
-  task_role_arn            = aws_iam_role.ecs_task_role.arn  # Task role ARN
+  family                   = "${var.prefix}-ocrmypdf-${var.environment}" 
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = var.ecs_cpu
+  memory                   = var.ecs_memory
+  execution_role_arn       = aws_iam_role.ecs_execution_role.arn
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
 
-  # Container definition with environment variables and logging
   container_definitions = jsonencode([
     {
-      name      = "ocrmypdf"  # Container name
-      image     = length(var.docker_hub_image) > 0 ? var.docker_hub_image : "${aws_ecr_repository.ocrmypdf.repository_url}:latest"
-      essential = true  # Essential container flag
+      name      = "ocrmypdf"
+      image     = var.docker_hub_image
+      essential = true
       environment = [
         { name = "SQS_QUEUE_URL", value = aws_sqs_queue.ocr_queue.url },
         { name = "S3_BUCKET", value = aws_s3_bucket.pdf_storage.id },
@@ -51,6 +50,7 @@ resource "aws_ecs_task_definition" "ocrmypdf" {
           awslogs-stream-prefix = "${var.prefix}-ocrmypdf"
         }
       }
+      portMappings = []
     }
   ])
 }

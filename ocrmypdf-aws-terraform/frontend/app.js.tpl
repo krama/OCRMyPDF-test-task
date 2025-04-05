@@ -42,15 +42,15 @@ document.addEventListener('DOMContentLoaded', function() {
          const timestamp = fileData.updated_at ? 
              new Date(fileData.updated_at * 1000).toLocaleString() : 'Unknown';
          
-         html += `<li class="file-item status-${status}">
+         html += `<li class="file-item status-$${status}">
              <div class="file-info">
-                 <span class="file-id">${fileId}</span>
-                 <span class="file-status">${status.toUpperCase()}</span>
-                 <span class="file-time">${timestamp}</span>
+                 <span class="file-id">$${fileId}</span>
+                 <span class="file-status">$${status.toUpperCase()}</span>
+                 <span class="file-time">$${timestamp}</span>
              </div>`;
          
          if (status === 'completed' && fileData.output_url) {
-             html += `<a href="${fileData.output_url}" class="download-btn" target="_blank">Download Processed PDF</a>`;
+             html += `<a href="$${fileData.output_url}" class="download-btn" target="_blank">Download Processed PDF</a>`;
          }
          
          html += `</li>`;
