@@ -3,10 +3,10 @@
 This Lambda function updates the file status on the website bucket based on SNS notifications.
 """
 
-import json  # JSON operations
-import os  # OS operations
-import time  # Time functions
-import boto3  # AWS SDK
+import json
+import os
+import time
+import boto3
 from botocore.exceptions import ClientError  # AWS exception handling
 
 # Initialize S3 client

@@ -4,12 +4,12 @@ This Lambda function processes multipart/form-data requests from API Gateway,
 uploads the PDF file to S3, and sends an SQS message to trigger OCR processing.
 """
 
-import json  # JSON operations
-import os  # OS operations
-import uuid  # Generate unique file IDs
-import time  # Time functions
-import boto3  # AWS SDK
-import base64  # Base64 decoding
+import json
+import os
+import uuid
+import time
+import boto3
+import base64
 
 # Initialize AWS clients
 s3 = boto3.client('s3')  # S3 client

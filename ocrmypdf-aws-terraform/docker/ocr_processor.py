@@ -4,14 +4,14 @@ This module processes PDF files using OCRMyPDF: downloads from S3, applies OCR,
 uploads the result to S3, and sends notifications via SNS.
 """
 
-import json  # JSON operations
-import os  # OS operations
-import time  # Time functions
-import subprocess  # Run shell commands
-import boto3  # AWS SDK
-import logging  # Logging
-import tempfile  # Temporary file management
-from urllib.parse import urlparse  # URL parsing
+import json
+import os
+import time
+import subprocess
+import boto3
+import logging
+import tempfile
+from urllib.parse import urlparse
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')

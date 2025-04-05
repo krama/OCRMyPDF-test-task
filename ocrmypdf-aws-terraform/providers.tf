@@ -1,11 +1,9 @@
-# ┏━┓┏━┓┏━┓╻ ╻╻╺┳┓┏━╸┏━┓┏━┓
-# ┣━┛┣┳┛┃ ┃┃┏┛┃ ┃┃┣╸ ┣┳┛┗━┓
-# ╹  ╹┗╸┗━┛┗┛ ╹╺┻┛┗━╸╹┗╸┗━┛
+# Configuration of providers
 
 provider "aws" {
   region = var.region
 
-  # Локалстек конфигурация
+  # LocalStack configuration
   dynamic "endpoints" {
     for_each = var.use_localstack ? [1] : []
     content {
@@ -53,41 +51,16 @@ provider "aws" {
   }
 }
 
+# Docker provider for interacting with ECR
 provider "docker" {
   registry_auth {
-    address  = aws_ecr_repository.ocrmypdf.repository_url
+    address  = module.container.ecr_repository_url
     username = "AWS"
     password = var.use_localstack ? "test" : data.aws_ecr_authorization_token.token[0].password
   }
 }
 
+# Get ECR authorization token for Docker
 data "aws_ecr_authorization_token" "token" {
   count = var.use_localstack ? 0 : 1
 }
-
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.0"
-    }
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = "~> 3.0"
-    }
-    template = {
-      source  = "hashicorp/template" 
-      version = "~> 2.2"
-    }
-  }
-# ╺┳╸┏━╸   ┏━┓╺┳╸┏━┓╺┳╸┏━╸
-#  ┃ ┣╸    ┗━┓ ┃ ┣━┫ ┃ ┣╸ 
-#  ╹ ╹     ┗━┛ ╹ ╹ ╹ ╹ ┗━╸
-
-  # backend "s3" {
-  #   bucket = "ocrmypdf-state-bucket"
-  #   key    = "ocrmypdf/terraform.tfstate"
-  #   region = "us-east-1"
-  # }
-}
-

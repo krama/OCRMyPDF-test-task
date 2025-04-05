@@ -1,20 +1,19 @@
-# ╻ ╻┏━┓┏━┓┏━┓
-# ┃┏┛┣━┫┣┳┛┗━┓
-# ┗┛ ╹ ╹╹┗╸┗━┛
+# Basic variables for OCRMyPDF infrastructure
 
+# General settings
 variable "region" {
-  description = "AWS region"
+  description = "AWS region for deployment"
   type        = string
   default     = "eu-central-2"
 }
 
 variable "environment" {
-  description = "Deployment environment"
+  description = "Deployment environment (dev, staging, prod)"
   type        = string
   default     = "dev"
   validation {
     condition     = contains(["dev", "staging", "prod"], var.environment)
-    error_message = "Environment must be one of: dev, staging, prod."
+    error_message = "Value of environment must be one of: dev, staging, prod."
   }
 }
 
@@ -24,24 +23,26 @@ variable "prefix" {
   default     = "ocrmypdf"
 }
 
+# Networking settings
 variable "vpc_id" {
-  description = "VPC ID where resources will be deployed (optional if creating new VPC)"
+  description = "ID of existing VPC (optional, if a new one should be created)"
   type        = string
   default     = null
 }
 
 variable "subnet_ids" {
-  description = "Subnet IDs for ECS tasks (optional if creating new subnets)"
+  description = "IDs of subnets for ECS tasks (optional, if new ones should be created)"
   type        = list(string)
   default     = []
 }
 
 variable "lambda_subnet_ids" {
-  description = "Subnet IDs for Lambda functions (optional if creating new subnets)"
+  description = "IDs of subnets for Lambda functions (optional, if new ones should be created)"
   type        = list(string)
   default     = []
 }
 
+# Container settings
 variable "docker_hub_image" {
   description = "Docker Hub image (optional)"
   type        = string
@@ -49,13 +50,14 @@ variable "docker_hub_image" {
 }
 
 variable "force_delete_ecr" {
-  description = "Whether to force delete ECR repository with images"
+  description = "Force delete ECR repository with images"
   type        = bool
   default     = false
 }
 
+# LocalStack settings
 variable "use_localstack" {
-  description = "Whether to use LocalStack for local development"
+  description = "Use LocalStack for local development"
   type        = bool
   default     = true
 }
@@ -78,12 +80,14 @@ variable "localstack_secret_key" {
   default     = "test"
 }
 
+# API Gateway settings
 variable "api_stage_name" {
   description = "API Gateway stage name"
   type        = string
   default     = "dev"
 }
 
+# Lambda settings
 variable "lambda_timeout" {
   description = "Lambda function timeout in seconds"
   type        = number
@@ -96,14 +100,15 @@ variable "lambda_memory_size" {
   default     = 256
 }
 
+# ECS settings
 variable "ecs_cpu" {
-  description = "CPU units for ECS tasks"
+  description = "ECS task CPU units"
   type        = string
   default     = "1024"
 }
 
 variable "ecs_memory" {
-  description = "Memory for ECS tasks in MB"
+  description = "ECS task memory in MB"
   type        = string
   default     = "2048"
 }
@@ -115,11 +120,12 @@ variable "ecs_desired_count" {
 }
 
 variable "force_ecs_service" {
-  description = "Force create ECS service even when using LocalStack"
+  description = "Force create ECS service when using LocalStack"
   type        = bool
   default     = false
 }
 
+# Autoscaling settings
 variable "min_capacity" {
   description = "Minimum number of ECS tasks for autoscaling"
   type        = number
@@ -138,20 +144,22 @@ variable "target_sqs_messages_per_task" {
   default     = 10
 }
 
+# S3 settings
 variable "s3_force_destroy" {
-  description = "Force destroy S3 buckets even if they contain objects"
+  description = "Force delete S3 buckets, even if they contain objects"
   type        = bool
   default     = true
 }
 
+# SQS settings
 variable "sqs_visibility_timeout" {
-  description = "Visibility timeout for SQS messages in seconds"
+  description = "SQS message visibility timeout in seconds"
   type        = number
   default     = 600
 }
 
 variable "sqs_message_retention" {
-  description = "Message retention period in seconds"
+  description = "SQS message retention period in seconds"
   type        = number
   default     = 86400
 }

@@ -1,7 +1,6 @@
-# ┏━╸┏━╸┏━┓
-# ┣╸ ┃  ┣┳┛
-# ┗━╸┗━╸╹┗╸
+# ━━━ Container Module for OCRMyPDF ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+# ECR repository for OCRMyPDF
 resource "aws_ecr_repository" "ocrmypdf" {
   name                 = "${var.prefix}-ocrmypdf-${var.environment}"
   image_tag_mutability = "MUTABLE"
@@ -10,8 +9,33 @@ resource "aws_ecr_repository" "ocrmypdf" {
   image_scanning_configuration {
     scan_on_push = true
   }
+  
+  tags = {}
 }
 
+# Lifecycle policy for ECR
+resource "aws_ecr_lifecycle_policy" "ocrmypdf_policy" {
+  repository = aws_ecr_repository.ocrmypdf.name
+
+  policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1,
+        description  = "Retain only the last 5 images",
+        selection = {
+          tagStatus   = "any",
+          countType   = "imageCountMoreThan",
+          countNumber = 5
+        },
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
+}
+
+# For LocalStack: prepare and upload Docker image
 resource "null_resource" "docker_pull_and_push" {
   count = var.use_localstack ? 1 : 0
   
@@ -37,25 +61,4 @@ resource "null_resource" "docker_pull_and_push" {
   }
 
   depends_on = [aws_ecr_repository.ocrmypdf]
-}
-
-resource "aws_ecr_lifecycle_policy" "ocrmypdf_policy" {
-  repository = aws_ecr_repository.ocrmypdf.name
-
-  policy = jsonencode({
-    rules = [
-      {
-        rulePriority = 1,
-        description  = "Keep last 5 images",
-        selection = {
-          tagStatus   = "any",
-          countType   = "imageCountMoreThan",
-          countNumber = 5
-        },
-        action = {
-          type = "expire"
-        }
-      }
-    ]
-  })
 }
