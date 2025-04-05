@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCRMyPDF Service</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>OCRMyPDF Service</h1>
+        
+        <div class="upload-section">
+            <h2>Upload PDF for OCR Processing</h2>
+            <form id="upload-form">
+                <div class="file-input">
+                    <input type="file" id="pdf-file" accept=".pdf" required>
+                    <label for="pdf-file">Choose a PDF file</label>
+                </div>
+                
+                <div class="options">
+                    <label>
+                        <input type="checkbox" id="deskew" checked>
+                        Deskew (Correct page rotation)
+                    </label>
+                </div>
+                
+                <button type="submit" id="submit-btn">Upload and Process</button>
+            </form>
+        </div>
+        
+        <div class="processing-section">
+            <h2>Processing Status</h2>
+            <div id="status-container">
+                <p class="no-files">No files uploaded yet</p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
