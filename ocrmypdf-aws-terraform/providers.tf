@@ -1,67 +1,70 @@
-#  ╔═╗╦═╗╔═╗╦  ╦╦╔╦╗╔═╗╦═╗╔═╗
-#  ╠═╝╠╦╝║ ║╚╗╔╝║ ║║║╣ ╠╦╝╚═╗
-#  ╩  ╩╚═╚═╝ ╚╝ ╩═╩╝╚═╝╩╚═╚═╝
+# ┏━┓┏━┓┏━┓╻ ╻╻╺┳┓┏━╸┏━┓┏━┓
+# ┣━┛┣┳┛┃ ┃┃┏┛┃ ┃┃┣╸ ┣┳┛┗━┓
+# ╹  ╹┗╸┗━┛┗┛ ╹╺┻┛┗━╸╹┗╸┗━┛
 
 provider "aws" {
   region = var.region
-#
-# Uncoment if you want to use localstack
-#
-#   access_key                  = "test"
-#   secret_key                  = "test"
-#   skip_credentials_validation = true
-#   skip_requesting_account_id  = true
-#   skip_metadata_api_check     = true
-#   s3_use_path_style           = true
-# endpoints {
-#   apigateway     = "http://localhost:4566"
-#   appautoscaling = "http://localhost:4566"
-#   cloudformation = "http://localhost:4566"
-#   cloudwatch     = "http://localhost:4566"
-#   cloudwatchlogs = "http://localhost:4566"
-#   dynamodb       = "http://localhost:4566"
-#   ec2            = "http://localhost:4566"
-#   ecr            = "http://localhost:4566"
-#   ecs            = "http://localhost:4566"
-#   es             = "http://localhost:4566"
-#   firehose       = "http://localhost:4566"
-#   iam            = "http://localhost:4566"
-#   kinesis        = "http://localhost:4566"
-#   kms            = "http://localhost:4566"
-#   lambda         = "http://localhost:4566"
-#   redshift       = "http://localhost:4566"
-#   route53        = "http://localhost:4566"
-#   s3             = "http://localhost:4566"
-#   secretsmanager = "http://localhost:4566"
-#   ses            = "http://localhost:4566"
-#   sns            = "http://localhost:4566"
-#   sqs            = "http://localhost:4566"
-#   ssm            = "http://localhost:4566"
-#   stepfunctions  = "http://localhost:4566"
-#   sts            = "http://localhost:4566"
-# }
+
+  # Локалстек конфигурация
+  dynamic "endpoints" {
+    for_each = var.use_localstack ? [1] : []
+    content {
+      apigateway     = var.localstack_endpoint
+      appautoscaling = var.localstack_endpoint
+      cloudformation = var.localstack_endpoint
+      cloudwatch     = var.localstack_endpoint
+      cloudwatchlogs = var.localstack_endpoint
+      dynamodb       = var.localstack_endpoint
+      ec2            = var.localstack_endpoint
+      ecr            = var.localstack_endpoint
+      ecs            = var.localstack_endpoint
+      es             = var.localstack_endpoint
+      firehose       = var.localstack_endpoint
+      iam            = var.localstack_endpoint
+      kinesis        = var.localstack_endpoint
+      kms            = var.localstack_endpoint
+      lambda         = var.localstack_endpoint
+      redshift       = var.localstack_endpoint
+      route53        = var.localstack_endpoint
+      s3             = var.localstack_endpoint
+      secretsmanager = var.localstack_endpoint
+      ses            = var.localstack_endpoint
+      sns            = var.localstack_endpoint
+      sqs            = var.localstack_endpoint
+      ssm            = var.localstack_endpoint
+      stepfunctions  = var.localstack_endpoint
+      sts            = var.localstack_endpoint
+    }
+  }
+
+  access_key                  = var.use_localstack ? var.localstack_access_key : null
+  secret_key                  = var.use_localstack ? var.localstack_secret_key : null
+  skip_credentials_validation = var.use_localstack
+  skip_requesting_account_id  = var.use_localstack
+  skip_metadata_api_check     = var.use_localstack
+  s3_use_path_style           = var.use_localstack
+
   default_tags {
     tags = {
-      Project     = "OCRMyPDF"  # Project tag
-      Environment = var.environment  # Environment tag
+      Project     = "OCRMyPDF"
+      Environment = var.environment
       ManagedBy   = "Terraform"
     }
   }
 }
 
-# Docker provider configuration for building/pushing images to ECR
 provider "docker" {
   registry_auth {
     address  = aws_ecr_repository.ocrmypdf.repository_url
     username = "AWS"
-    password = data.aws_ecr_authorization_token.token.password
+    password = var.use_localstack ? "test" : data.aws_ecr_authorization_token.token[0].password
   }
 }
 
-# Data source for AWS ECR authorization token
-data "aws_ecr_authorization_token" "token" {}
+data "aws_ecr_authorization_token" "token" {
+  count = var.use_localstack ? 0 : 1
+}
 
-# Terraform settings and backend configuration for remote state storage
 terraform {
   required_providers {
     aws = {
@@ -72,14 +75,19 @@ terraform {
       source  = "kreuzwerker/docker"
       version = "~> 3.0"
     }
+    template = {
+      source  = "hashicorp/template" 
+      version = "~> 2.2"
+    }
   }
-#  ╔╦╗╔═╗╦═╗╦═╗╔═╗╔═╗╔═╗╦═╗╔╦╗  ╔═╗╔╦╗╔═╗╔╦╗╔═╗
-#   ║ ║╣ ╠╦╝╠╦╝╠═╣╠╣ ║ ║╠╦╝║║║  ╚═╗ ║ ╠═╣ ║ ║╣ 
-#   ╩ ╚═╝╩╚═╩╚═╩ ╩╚  ╚═╝╩╚═╩ ╩  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
+# ╺┳╸┏━╸   ┏━┓╺┳╸┏━┓╺┳╸┏━╸
+#  ┃ ┣╸    ┗━┓ ┃ ┣━┫ ┃ ┣╸ 
+#  ╹ ╹     ┗━┛ ╹ ╹ ╹ ╹ ┗━╸
 
-  backend "s3" {
-    bucket = "ocrmypdf-state-bucket"
-    key    = "ocrmypdf/terraform.tfstate"
-    region = var.region
-  }
+  # backend "s3" {
+  #   bucket = "ocrmypdf-state-bucket"
+  #   key    = "ocrmypdf/terraform.tfstate"
+  #   region = "us-east-1"
+  # }
 }
+

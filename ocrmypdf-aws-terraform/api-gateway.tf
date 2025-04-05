@@ -1,7 +1,6 @@
-#  ╦═╗╔═╗╔═╗╔╦╗  ╔═╗╔═╗╦  ╔═╗╔═╗╦═╗  ╔═╗╔═╗╦═╗
-#  ╠╦╝║╣ ╚═╗ ║   ╠═╣╠═╝║  ╠╣ ║ ║╠╦╝  ║ ║║  ╠╦╝
-#  ╩╚═╚═╝╚═╝ ╩   ╩ ╩╩  ╩  ╚  ╚═╝╩╚═  ╚═╝╚═╝╩╚═
-
+# ┏━┓┏━╸┏━┓╺┳╸   ┏━┓┏━┓╻   ┏━╸┏━┓┏━┓   ┏━┓┏━╸┏━┓
+# ┣┳┛┣╸ ┗━┓ ┃    ┣━┫┣━┛┃   ┣╸ ┃ ┃┣┳┛   ┃ ┃┃  ┣┳┛
+# ╹┗╸┗━╸┗━┛ ╹    ╹ ╹╹  ╹   ╹  ┗━┛╹┗╸   ┗━┛┗━╸╹┗╸
 resource "aws_api_gateway_rest_api" "ocr_api" {
   name        = "${var.prefix}-ocr-api-${var.environment}"  # API name
   description = "API for OCR PDF processing"  # API description
@@ -41,9 +40,9 @@ resource "aws_lambda_permission" "api_gateway" {
   source_arn    = "${aws_api_gateway_rest_api.ocr_api.execution_arn}/*/${aws_api_gateway_method.upload_post.http_method}${aws_api_gateway_resource.upload.path}"  # Source ARN
 }
 
-#  ╔═╗╔═╗╦═╗╔═╗
-#  ║  ║ ║╠╦╝╚═╗
-#  ╚═╝╚═╝╩╚═╚═╝
+# ┏━╸┏━┓┏━┓┏━┓
+# ┃  ┃ ┃┣┳┛┗━┓
+# ┗━╸┗━┛╹┗╸┗━┛
 resource "aws_api_gateway_method" "upload_options" {
   rest_api_id   = aws_api_gateway_rest_api.ocr_api.id  # API ID
   resource_id   = aws_api_gateway_resource.upload.id  # Resource ID
@@ -99,9 +98,9 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   rest_api_id = aws_api_gateway_rest_api.ocr_api.id  # API ID
 }
 
-#  ╔═╗╔═╗╦  ╔═╗╔╦╗╔═╗╔═╗╔═╗
-#  ╠═╣╠═╝║  ╚═╗ ║ ╠═╣║ ╦║╣ 
-#  ╩ ╩╩  ╩  ╚═╝ ╩ ╩ ╩╚═╝╚═╝
+# ┏━┓┏━┓╻   ┏━┓╺┳╸┏━┓┏━╸┏━╸
+# ┣━┫┣━┛┃   ┗━┓ ┃ ┣━┫┃╺┓┣╸ 
+# ╹ ╹╹  ╹   ┗━┛ ╹ ╹ ╹┗━┛┗━╸
 resource "aws_api_gateway_stage" "api_stage" {
   deployment_id = aws_api_gateway_deployment.api_deployment.id  # Deployment ID
   rest_api_id   = aws_api_gateway_rest_api.ocr_api.id  # API ID

@@ -1,6 +1,7 @@
-#  ╦╔═╗╔╦╗  ╔═╗╔═╗╦═╗  ╦  ╔═╗╔╦╗╔╗ ╔╦╗╔═╗  ╦ ╦╔═╗╦  ╔═╗╔═╗╔╦╗╔═╗╦═╗
-#  ║╠═╣║║║  ╠╣ ║ ║╠╦╝  ║  ╠═╣║║║╠╩╗ ║║╠═╣  ║ ║╠═╝║  ║ ║╠═╣ ║║║╣ ╠╦╝
-#  ╩╩ ╩╩ ╩  ╚  ╚═╝╩╚═  ╩═╝╩ ╩╩ ╩╚═╝═╩╝╩ ╩  ╚═╝╩  ╩═╝╚═╝╩ ╩═╩╝╚═╝╩╚═
+# ╻  ┏━┓┏┳┓┏┓ ╺┳┓┏━┓   ╻ ╻┏━┓╻  ┏━┓┏━┓╺┳┓┏━╸┏━┓
+# ┃  ┣━┫┃┃┃┣┻┓ ┃┃┣━┫   ┃ ┃┣━┛┃  ┃ ┃┣━┫ ┃┃┣╸ ┣┳┛
+# ┗━╸╹ ╹╹ ╹┗━┛╺┻┛╹ ╹   ┗━┛╹  ┗━╸┗━┛╹ ╹╺┻┛┗━╸╹┗╸
+
 resource "aws_iam_role" "lambda_upload_role" {
   name = "${var.prefix}-lambda-upload-role-${var.environment}"  # Role name
   assume_role_policy = jsonencode({
@@ -50,9 +51,10 @@ resource "aws_iam_role_policy_attachment" "lambda_upload_attach" {
   policy_arn = aws_iam_policy.lambda_upload_policy.arn
 }
 
-#  ╦╔═╗╔╦╗  ╔═╗╔═╗╦═╗  ╦  ╔═╗╔╦╗╔╗ ╔╦╗╔═╗  ╦ ╦╔═╗╔╦╗╔═╗╔╦╗╔═╗╦═╗
-#  ║╠═╣║║║  ╠╣ ║ ║╠╦╝  ║  ╠═╣║║║╠╩╗ ║║╠═╣  ║ ║╠═╝ ║║╠═╣ ║ ║╣ ╠╦╝
-#  ╩╩ ╩╩ ╩  ╚  ╚═╝╩╚═  ╩═╝╩ ╩╩ ╩╚═╝═╩╝╩ ╩  ╚═╝╩  ═╩╝╩ ╩ ╩ ╚═╝╩╚═
+# ╻  ┏━┓┏┳┓┏┓ ╺┳┓┏━┓   ╻ ╻┏━┓╺┳┓┏━┓╺┳╸┏━╸┏━┓
+# ┃  ┣━┫┃┃┃┣┻┓ ┃┃┣━┫   ┃ ┃┣━┛ ┃┃┣━┫ ┃ ┣╸ ┣┳┛
+# ┗━╸╹ ╹╹ ╹┗━┛╺┻┛╹ ╹   ┗━┛╹  ╺┻┛╹ ╹ ╹ ┗━╸╹┗╸
+
 resource "aws_iam_role" "lambda_status_role" {
   name = "${var.prefix}-lambda-status-role-${var.environment}"  # Role name
   assume_role_policy = jsonencode({
@@ -100,9 +102,10 @@ resource "aws_iam_role_policy_attachment" "lambda_status_attach" {
   policy_arn = aws_iam_policy.lambda_status_policy.arn
 }
 
-#  ╦╔═╗╔╦╗  ╔═╗╔═╗╦═╗  ╔═╗╔═╗╔═╗  ╔╦╗╔═╗╔═╗╦╔═
-#  ║╠═╣║║║  ╠╣ ║ ║╠╦╝  ║╣ ║  ╚═╗   ║ ╠═╣╚═╗╠╩╗
-#  ╩╩ ╩╩ ╩  ╚  ╚═╝╩╚═  ╚═╝╚═╝╚═╝   ╩ ╩ ╩╚═╝╩ ╩
+# ┏━╸┏━╸┏━┓   ╺┳╸┏━┓┏━┓╻┏ 
+# ┣╸ ┃  ┗━┓    ┃ ┣━┫┗━┓┣┻┓
+# ┗━╸┗━╸┗━┛    ╹ ╹ ╹┗━┛╹ ╹
+
 resource "aws_iam_role" "ecs_execution_role" {
   name = "${var.prefix}-ecs-execution-role-${var.environment}"  # Role name
   assume_role_policy = jsonencode({
@@ -166,9 +169,10 @@ resource "aws_iam_role_policy_attachment" "ecs_task_attach" {
   policy_arn = aws_iam_policy.ecs_task_policy.arn
 }
 
-#  ╔═╗╔═╗╔═╗╦ ╦╦═╗╦╔╦╗╦ ╦  ╔═╗╦═╗╔═╗╦ ╦╔═╗  ╦  ╔═╗╔╦╗╔╗ ╔╦╗╔═╗
-#  ╚═╗║╣ ║  ║ ║╠╦╝║ ║ ╚╦╝  ║ ╦╠╦╝║ ║║ ║╠═╝  ║  ╠═╣║║║╠╩╗ ║║╠═╣
-#  ╚═╝╚═╝╚═╝╚═╝╩╚═╩ ╩  ╩   ╚═╝╩╚═╚═╝╚═╝╩    ╩═╝╩ ╩╩ ╩╚═╝═╩╝╩ ╩
+# ┏━┓┏━╸   ╻  ┏━┓┏┳┓┏┓ ╺┳┓┏━┓
+# ┗━┓┃╺┓   ┃  ┣━┫┃┃┃┣┻┓ ┃┃┣━┫
+# ┗━┛┗━┛   ┗━╸╹ ╹╹ ╹┗━┛╺┻┛╹ ╹
+
 resource "aws_security_group" "lambda_sg" {
   name        = "${var.prefix}-lambda-sg-${var.environment}"  # SG name
   description = "Security group for Lambda functions"  # SG description
@@ -182,9 +186,10 @@ resource "aws_security_group" "lambda_sg" {
   }
 }
 
-#  ╔═╗╔═╗╔═╗╦ ╦╦═╗╦╔╦╗╦ ╦  ╔═╗╦═╗╔═╗╦ ╦╔═╗  ╔═╗╔═╗╔═╗
-#  ╚═╗║╣ ║  ║ ║╠╦╝║ ║ ╚╦╝  ║ ╦╠╦╝║ ║║ ║╠═╝  ║╣ ║  ╚═╗
-#  ╚═╝╚═╝╚═╝╚═╝╩╚═╩ ╩  ╩   ╚═╝╩╚═╚═╝╚═╝╩    ╚═╝╚═╝╚═╝
+# ┏━┓┏━╸   ┏━╸┏━╸┏━┓
+# ┗━┓┃╺┓   ┣╸ ┃  ┗━┓
+# ┗━┛┗━┛   ┗━╸┗━╸┗━┛
+
 resource "aws_security_group" "ecs_sg" {
   name        = "${var.prefix}-ecs-sg-${var.environment}"  # SG name
   description = "Security group for ECS tasks"  # SG description

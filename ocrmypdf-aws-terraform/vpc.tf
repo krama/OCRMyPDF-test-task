@@ -1,7 +1,6 @@
-#  ╦  ╦╔═╗╔═╗  ╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔
-#  ╚╗╔╝╠═╝║    ║  ╠╦╝║╣ ╠═╣ ║ ║║ ║║║║
-#   ╚╝ ╩  ╚═╝  ╚═╝╩╚═╚═╝╩ ╩ ╩ ╩╚═╝╝╚╝
-
+# ╻ ╻┏━┓┏━╸   ┏━╸┏━┓┏━╸┏━┓╺┳╸╻┏━┓┏┓╻
+# ┃┏┛┣━┛┃     ┃  ┣┳┛┣╸ ┣━┫ ┃ ┃┃ ┃┃┗┫
+# ┗┛ ╹  ┗━╸   ┗━╸╹┗╸┗━╸╹ ╹ ╹ ╹┗━┛╹ ╹
 # Create a new VPC if no external VPC ID is provided
 resource "aws_vpc" "main" {
   count = var.vpc_id == null ? 1 : 0
@@ -15,10 +14,9 @@ resource "aws_vpc" "main" {
   }
 }
 
-#  ╔═╗╦ ╦╔╗ ╔╗╔╔═╗╔╦╗╔═╗  ╔═╗╦═╗╦╦  ╦╔═╗╔╦╗╔═╗
-#  ╚═╗║ ║╠╩╗║║║║╣  ║ ╚═╗  ╠═╝╠╦╝║╚╗╔╝╠═╣ ║ ║╣ 
-#  ╚═╝╚═╝╚═╝╝╚╝╚═╝ ╩ ╚═╝  ╩  ╩╚═╩ ╚╝ ╩ ╩ ╩ ╚═╝
-
+# ┏━┓╻ ╻┏┓ ┏┓╻┏━╸╺┳╸┏━┓   ┏━┓┏━┓╻╻ ╻┏━┓╺┳╸┏━╸
+# ┗━┓┃ ┃┣┻┓┃┗┫┣╸  ┃ ┗━┓   ┣━┛┣┳┛┃┃┏┛┣━┫ ┃ ┣╸ 
+# ┗━┛┗━┛┗━┛╹ ╹┗━╸ ╹ ┗━┛   ╹  ╹┗╸╹┗┛ ╹ ╹ ╹ ┗━╸
 # Create private subnet 1
 resource "aws_subnet" "private_subnet_1" {
   count = var.vpc_id == null ? 1 : 0
@@ -45,10 +43,9 @@ resource "aws_subnet" "private_subnet_2" {
   }
 }
 
-#  ╔═╗╦ ╦╔╗ ╔╗╔╔═╗╔╦╗╔═╗  ╔═╗╦ ╦╔╗ ╦  ╦╔═╗
-#  ╚═╗║ ║╠╩╗║║║║╣  ║ ╚═╗  ╠═╝║ ║╠╩╗║  ║║  
-#  ╚═╝╚═╝╚═╝╝╚╝╚═╝ ╩ ╚═╝  ╩  ╚═╝╚═╝╩═╝╩╚═╝
-
+# ┏━┓╻ ╻┏┓ ┏┓╻┏━╸╺┳╸┏━┓   ┏━┓╻ ╻┏┓ ╻  ╻┏━╸
+# ┗━┓┃ ┃┣┻┓┃┗┫┣╸  ┃ ┗━┓   ┣━┛┃ ┃┣┻┓┃  ┃┃  
+# ┗━┛┗━┛┗━┛╹ ╹┗━╸ ╹ ┗━┛   ╹  ┗━┛┗━┛┗━╸╹┗━╸
 # Create public subnet 1
 resource "aws_subnet" "public_subnet_1" {
   count = var.vpc_id == null ? 1 : 0
@@ -77,10 +74,9 @@ resource "aws_subnet" "public_subnet_2" {
   }
 }
 
-#  ╦╔═╗  ╔═╗╦ ╦╔╗ ╦  ╦╔═╗
-#  ║║ ╦  ╠═╝║ ║╠╩╗║  ║║  
-#  ╩╚═╝  ╩  ╚═╝╚═╝╩═╝╩╚═╝
-
+# ╻┏━╸   ┏━┓╻ ╻┏┓ ╻  ╻┏━╸
+# ┃┃╺┓   ┣━┛┃ ┃┣┻┓┃  ┃┃  
+# ╹┗━┛   ╹  ┗━┛┗━┛┗━╸╹┗━╸
 # Create an Internet Gateway for public subnets
 resource "aws_internet_gateway" "igw" {
   count = var.vpc_id == null ? 1 : 0
@@ -92,10 +88,9 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-#  ╦═╗╔═╗╦ ╦╔╦╗╔═╗
-#  ╠╦╝║ ║║ ║ ║ ║╣ 
-#  ╩╚═╚═╝╚═╝ ╩ ╚═╝
-
+# ┏━┓┏━┓╻ ╻╺┳╸┏━╸
+# ┣┳┛┃ ┃┃ ┃ ┃ ┣╸ 
+# ╹┗╸┗━┛┗━┛ ╹ ┗━╸
 # Create a route table for public subnets
 resource "aws_route_table" "public_rt" {
   count = var.vpc_id == null ? 1 : 0
@@ -128,10 +123,9 @@ resource "aws_route_table_association" "public_2" {
   route_table_id = aws_route_table.public_rt[0].id           # Public route table ID
 }
 
-#  ╔╗╔╔═╗╔╦╗
-#  ║║║╠═╣ ║ 
-#  ╝╚╝╩ ╩ ╩ 
-
+# ┏┓╻┏━┓╺┳╸
+# ┃┗┫┣━┫ ┃ 
+# ╹ ╹╹ ╹ ╹ 
 # Allocate an Elastic IP for the NAT Gateway
 resource "aws_eip" "nat_eip" {
   count  = var.vpc_id == null ? 1 : 0

@@ -1,6 +1,6 @@
-#  ╔═╗╔═╗╔═╗  ╔═╗╦  ╦ ╦╔═╗╔╦╗╔═╗╦═╗
-#  ║╣ ║  ╚═╗  ║  ║  ║ ║╚═╗ ║ ║╣ ╠╦╝
-#  ╚═╝╚═╝╚═╝  ╚═╝╩═╝╚═╝╚═╝ ╩ ╚═╝╩╚═
+# ┏━╸╻  ╻ ╻┏━┓╺┳╸┏━╸┏━┓
+# ┃  ┃  ┃ ┃┗━┓ ┃ ┣╸ ┣┳┛
+# ┗━╸┗━╸┗━┛┗━┛ ╹ ┗━╸╹┗╸
 
 resource "aws_ecs_cluster" "ocr_cluster" {
   name = "${var.prefix}-ocr-cluster-${var.environment}"  # Cluster name
@@ -10,25 +10,25 @@ resource "aws_ecs_cluster" "ocr_cluster" {
   }
 }
 
-#  ╔═╗╦  ╔═╗╦ ╦╔╦╗╦ ╦╔═╗╔╦╗╔═╗╦ ╦  ╔═╗╔═╗╔═╗
-#  ║  ║  ║ ║║ ║ ║║║║║╠═╣ ║ ║  ╠═╣  ║╣ ║  ╚═╗
-#  ╚═╝╩═╝╚═╝╚═╝═╩╝╚╩╝╩ ╩ ╩ ╚═╝╩ ╩  ╚═╝╚═╝╚═╝
+# ┏━╸╻  ┏━┓╻ ╻╺┳┓╻ ╻┏━┓╺┳╸┏━╸╻ ╻
+# ┃  ┃  ┃ ┃┃ ┃ ┃┃┃╻┃┣━┫ ┃ ┃  ┣━┫
+# ┗━╸┗━╸┗━┛┗━┛╺┻┛┗┻┛╹ ╹ ╹ ┗━╸╹ ╹
 
 resource "aws_cloudwatch_log_group" "ocrmypdf" {
   name              = "/ecs/${var.prefix}-ocrmypdf-${var.environment}"  # Log group name
   retention_in_days = 30  # Log retention period
 }
 
-#  ╔═╗╔═╗╔═╗  ╔╦╗╔═╗╔═╗╦╔═  ╔═╗╔═╗╦═╗  ╔═╗╔═╗╦═╗╔╦╗╦ ╦╔═╗╔╦╗╔═╗
-#  ║╣ ║  ╚═╗   ║ ╠═╣╚═╗╠╩╗  ╠╣ ║ ║╠╦╝  ║ ║║  ╠╦╝║║║╚╦╝╠═╝ ║║╠╣ 
-#  ╚═╝╚═╝╚═╝   ╩ ╩ ╩╚═╝╩ ╩  ╚  ╚═╝╩╚═  ╚═╝╚═╝╩╚═╩ ╩ ╩ ╩  ═╩╝╚  
+# ┏━╸┏━╸┏━┓   ╺┳╸┏━┓┏━┓╻┏ 
+# ┣╸ ┃  ┗━┓    ┃ ┣━┫┗━┓┣┻┓
+# ┗━╸┗━╸┗━┛    ╹ ╹ ╹┗━┛╹ ╹
 
 resource "aws_ecs_task_definition" "ocrmypdf" {
   family                   = "${var.prefix}-ocrmypdf-${var.environment}"  # Task family name
   requires_compatibilities = ["FARGATE"]  # Use Fargate launch type
   network_mode             = "awsvpc"  # Networking mode
-  cpu                      = "1024"  # CPU units
-  memory                   = "2048"  # Memory in MB
+  cpu                      = var.ecs_cpu  # CPU units
+  memory                   = var.ecs_memory  # Memory in MB
   execution_role_arn       = aws_iam_role.ecs_execution_role.arn  # Execution role ARN
   task_role_arn            = aws_iam_role.ecs_task_role.arn  # Task role ARN
 
@@ -55,15 +55,15 @@ resource "aws_ecs_task_definition" "ocrmypdf" {
   ])
 }
 
-#  ╔═╗╔═╗╔═╗  ╔═╗╔═╗╦═╗╦  ╦╦╔═╗╔═╗
-#  ║╣ ║  ╚═╗  ╚═╗║╣ ╠╦╝╚╗╔╝║║  ║╣ 
-#  ╚═╝╚═╝╚═╝  ╚═╝╚═╝╩╚═ ╚╝ ╩╚═╝╚═╝
+# ┏━╸┏━╸┏━┓   ┏━┓┏━╸┏━┓╻ ╻╻┏━╸┏━╸
+# ┣╸ ┃  ┗━┓   ┗━┓┣╸ ┣┳┛┃┏┛┃┃  ┣╸ 
+# ┗━╸┗━╸┗━┛   ┗━┛┗━╸╹┗╸┗┛ ╹┗━╸┗━╸
 
 resource "aws_ecs_service" "ocrmypdf" {
   name            = "${var.prefix}-ocrmypdf-${var.environment}"  # Service name
   cluster         = aws_ecs_cluster.ocr_cluster.id  # Cluster ID
   task_definition = aws_ecs_task_definition.ocrmypdf.arn  # Task definition ARN
-  desired_count   = 1  # Desired task count
+  desired_count   = var.ecs_desired_count  # Desired task count
   launch_type     = "FARGATE"  # Launch type
 
   network_configuration {
@@ -76,13 +76,13 @@ resource "aws_ecs_service" "ocrmypdf" {
   }
 }
 
-#  ╔═╗╦ ╦╔╦╗╔═╗   ╔═╗╔═╗╔═╗╦  ╦╔╗╔╔═╗  ╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗  ╔═╗╔═╗╦═╗  ╔═╗╔═╗╔═╗
-#  ╠═╣║ ║ ║ ║ ║───╚═╗║  ╠═╣║  ║║║║║ ╦   ║ ╠═╣╠╦╝║ ╦║╣  ║   ╠╣ ║ ║╠╦╝  ║╣ ║  ╚═╗
-#  ╩ ╩╚═╝ ╩ ╚═╝   ╚═╝╚═╝╩ ╩╩═╝╩╝╚╝╚═╝   ╩ ╩ ╩╩╚═╚═╝╚═╝ ╩   ╚  ╚═╝╩╚═  ╚═╝╚═╝╚═╝
+# ┏━┓┏━┓   ╺┳╸┏━┓┏━┓┏━╸┏━╸╺┳╸   ┏━╸┏━┓┏━┓   ┏━╸┏━╸┏━┓
+# ┣━┫┗━┓    ┃ ┣━┫┣┳┛┃╺┓┣╸  ┃    ┣╸ ┃ ┃┣┳┛   ┣╸ ┃  ┗━┓
+# ╹ ╹┗━┛    ╹ ╹ ╹╹┗╸┗━┛┗━╸ ╹    ╹  ┗━┛╹┗╸   ┗━╸┗━╸┗━┛
 
 resource "aws_appautoscaling_target" "ocrmypdf" {
-  max_capacity       = 10  # Maximum number of tasks
-  min_capacity       = 1  # Minimum number of tasks
+  max_capacity       = var.max_capacity  # Maximum number of tasks
+  min_capacity       = var.min_capacity  # Minimum number of tasks
   resource_id        = "service/${aws_ecs_cluster.ocr_cluster.name}/${aws_ecs_service.ocrmypdf.name}"  # Resource ID
   scalable_dimension = "ecs:service:DesiredCount"  # Scalable dimension
   service_namespace  = "ecs"  # Service namespace
@@ -97,7 +97,7 @@ resource "aws_appautoscaling_policy" "sqs_scaling" {
   service_namespace  = aws_appautoscaling_target.ocrmypdf.service_namespace  # Service namespace
 
   target_tracking_scaling_policy_configuration {
-    target_value       = 10  # Target value (SQS messages per task)
+    target_value       = var.target_sqs_messages_per_task  # Target value (SQS messages per task)
     scale_in_cooldown  = 300  # Scale-in cooldown in seconds
     scale_out_cooldown = 60   # Scale-out cooldown in seconds
     predefined_metric_specification {
