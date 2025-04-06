@@ -1,4 +1,4 @@
-# Output variables of the OCRMyPDF project ---------------------------------------------------
+# Output variables of the OCRMyPDF project
 
 output "website_url" {
   value       = module.storage.website_url
@@ -68,4 +68,14 @@ output "file_uploader_lambda_name" {
 output "status_updater_lambda_name" {
   value       = module.compute.status_updater_lambda_name
   description = "Name of the Lambda function for updating status"
+}
+
+output "api_id" {
+  value       = module.api.api_id
+  description = "ID of the REST API Gateway"
+}
+
+output "api_stage_name" {
+  value       = module.api.api_stage_name
+  description = "Name of the API Gateway stage"
 }

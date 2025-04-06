@@ -21,12 +21,6 @@ variable "vpc_id" {
   default     = null
 }
 
-variable "create_vpc" {
-  description = "Flag to create a new VPC"
-  type        = bool
-  default     = true
-}
-
 variable "vpc_cidr" {
   description = "CIDR block for VPC"
   type        = string

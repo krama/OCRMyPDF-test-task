@@ -42,6 +42,11 @@ variable "localstack_endpoint" {
   default     = "http://localhost:4566"
 }
 
+variable "region" {
+  description = "AWS region"
+  type        = string
+}
+
 variable "tags" {
   description = "Tags for resources"
   type        = map(string)

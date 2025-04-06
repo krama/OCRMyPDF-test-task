@@ -1,30 +1,37 @@
 # ━━━ Local Variables for OCRMyPDF Project ━━━━━━━━━━━━━━━━━━━━━━━━━
 
-# Standard tags for resources
 locals {
-  specific_tags = {
-  }  
+  # Common tags for all resources
+  common_tags = {
+    Project     = "OCRMyPDF"
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+    Owner       = "DevOps"
+  }
+
+  # Merge common tags with any specific tags provided
+  resource_tags = merge(local.common_tags, var.tags)
 
   # Full resource prefix considering the environment
   resource_prefix = "${var.prefix}-${var.environment}"
   
   # Names of key resources
-  lambda_uploader_name = "${var.prefix}-file-uploader-${var.environment}"
-  lambda_status_name   = "${var.prefix}-status-updater-${var.environment}"
-  ecs_cluster_name     = "${var.prefix}-ocr-cluster-${var.environment}"
-  ecr_repository_name  = "${var.prefix}-ocrmypdf-${var.environment}"
+  lambda_uploader_name = "${local.resource_prefix}-file-uploader"
+  lambda_status_name   = "${local.resource_prefix}-status-updater"
+  ecs_cluster_name     = "${local.resource_prefix}-ocr-cluster"
+  ecr_repository_name  = "${local.resource_prefix}-ocrmypdf"
   
   # S3 bucket names
-  pdf_bucket_name      = "${var.prefix}-pdf-storage-${var.environment}"
-  website_bucket_name  = "${var.prefix}-website-${var.environment}"
+  pdf_bucket_name      = "${local.resource_prefix}-pdf-storage"
+  website_bucket_name  = "${local.resource_prefix}-website"
   
   # Messaging resource names
-  sqs_queue_name       = "${var.prefix}-ocr-queue-${var.environment}"
-  sqs_dlq_name         = "${var.prefix}-ocr-dlq-${var.environment}"
-  sns_topic_name       = "${var.prefix}-ocr-notifications-${var.environment}"
+  sqs_queue_name       = "${local.resource_prefix}-ocr-queue"
+  sqs_dlq_name         = "${local.resource_prefix}-ocr-dlq"
+  sns_topic_name       = "${local.resource_prefix}-ocr-notifications"
   
   # API Gateway resource names
-  api_name             = "${var.prefix}-ocr-api-${var.environment}"
+  api_name             = "${local.resource_prefix}-ocr-api"
   
   # VPC configuration
   create_vpc           = var.vpc_id == null

@@ -96,9 +96,27 @@ resource "aws_api_gateway_integration_response" "upload_options_200" {
 resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on = [
     aws_api_gateway_integration.upload_lambda,
-    aws_api_gateway_integration.upload_options
+    aws_api_gateway_integration.upload_options,
+    aws_api_gateway_method_response.upload_options_200,
+    aws_api_gateway_integration_response.upload_options_200
   ]
+  
   rest_api_id = aws_api_gateway_rest_api.ocr_api.id
+  
+  # Добавление триггера для перезагрузки при изменениях
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.upload.id,
+      aws_api_gateway_method.upload_post.id,
+      aws_api_gateway_integration.upload_lambda.id,
+      aws_api_gateway_method.upload_options.id,
+      aws_api_gateway_integration.upload_options.id,
+    ]))
+  }
+  
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Create API stage

@@ -12,7 +12,7 @@ output "api_execution_arn" {
 
 output "api_endpoint" {
   description = "Base URL of API Gateway"
-  value       = "${aws_api_gateway_deployment.api_deployment.invoke_url}${aws_api_gateway_stage.api_stage.stage_name}/upload"
+  value       = "${aws_api_gateway_stage.api_stage.invoke_url}upload"
 }
 
 output "api_deployment_id" {
@@ -23,4 +23,9 @@ output "api_deployment_id" {
 output "api_stage_name" {
   description = "Name of API stage"
   value       = aws_api_gateway_stage.api_stage.stage_name
+}
+
+output "invoke_url" {
+  description = "Base URL of API Gateway stage"
+  value       = aws_api_gateway_stage.api_stage.invoke_url
 }

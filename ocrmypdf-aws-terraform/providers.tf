@@ -43,20 +43,16 @@ provider "aws" {
   s3_use_path_style           = var.use_localstack
 
   default_tags {
-    tags = {
-      Project     = "OCRMyPDF"
-      Environment = var.environment
-      ManagedBy   = "Terraform"
-    }
+    tags = local.common_tags
   }
 }
 
 # Docker provider for interacting with ECR
 provider "docker" {
   registry_auth {
-    address  = module.container.ecr_repository_url
+    address  = try(module.container.ecr_repository_url, "")
     username = "AWS"
-    password = var.use_localstack ? "test" : data.aws_ecr_authorization_token.token[0].password
+    password = var.use_localstack ? "test" : try(data.aws_ecr_authorization_token.token[0].password, "")
   }
 }
 
